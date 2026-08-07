@@ -178,7 +178,28 @@ Healthcheck : `GET /api/health`.
 
 Compatible Coolify : fournir `CLERK_SECRET_KEY` en runtime **et**
 `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` (et URLs sign-in/up) en **build-args**,
-puis rebuild. Sinon Clerk JS échoue (`failed_to_load_clerk_js`).
+puis rebuild. Voir checklist SSO ci-dessus pour le proxy `/__clerk`.
+
+### Coolify : build OK puis échec à « unpacking »
+
+Le `next build` peut réussir et Coolify échouer ensuite (exit 255) sur
+l’unpack Docker — souvent **disque plein** ou attestations BuildKit.
+
+Sur le VPS :
+
+```bash
+df -h
+docker system df
+docker system prune -af   # libère images/caches inutilisés
+```
+
+Dans Coolify → app → Advanced / Docker Build Options (si dispo) :
+
+```text
+--provenance=false --sbom=false
+```
+
+Puis **Redeploy**. L’ancienne version reste en ligne tant que le nouveau deploy échoue.
 
 ---
 
