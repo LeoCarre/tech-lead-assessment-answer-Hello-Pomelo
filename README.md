@@ -96,24 +96,25 @@ CLERK_SECRET_KEY=sk_live_…                   # ou sk_test_…
 DuckDNS ne permet en général **pas** de CNAME Clerk correct. On proxye la
 Frontend API via notre domaine (`/__clerk`) — TLS Let’s Encrypt du site.
 
-**Local** : ne pas définir `NEXT_PUBLIC_CLERK_PROXY_URL` (clés `pk_test_` → `*.clerk.accounts.dev`).
+**Local** : clés `pk_test_` → pas de proxy (`*.clerk.accounts.dev`).
 
-**Prod** :
+**Prod** : avec `pk_live_`, le code active **automatiquement** le proxy `/__clerk`
+(pas besoin d’oublier le build-arg). Optionnel : forcer
+`NEXT_PUBLIC_CLERK_PROXY_URL=/__clerk` en Coolify.
 
 1. Clerk → Domains : domaine d’app = `hello-pomelo.duckdns.org`.
 2. Frontend API → **Set proxy configuration** :
    `https://hello-pomelo.duckdns.org/__clerk`
-   (Clerk valide que le proxy répond avant d’activer.)
+   (à faire **après** le rebuild, Clerk valide le endpoint).
 3. Coolify — **Build-time** + runtime :
    - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` = `pk_live_…`
    - `CLERK_SECRET_KEY` = `sk_live_…`
    - `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`
    - `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up`
-   - `NEXT_PUBLIC_CLERK_PROXY_URL=/__clerk`
 4. **Rebuild** (obligatoire : `NEXT_PUBLIC_*` inlinées au build).
 
-Le middleware (`src/proxy.ts`) active `frontendApiProxy` seulement si
-`NEXT_PUBLIC_CLERK_PROXY_URL` est défini.
+Le middleware (`src/proxy.ts`) active `frontendApiProxy` dès qu’un proxy URL
+est résolu (`pk_live_` ou env explicite).
 
 Vérification post-deploy :
 
