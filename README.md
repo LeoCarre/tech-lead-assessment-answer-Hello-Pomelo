@@ -93,19 +93,44 @@ CLERK_SECRET_KEY=sk_live_…                   # ou sk_test_…
 
 ### Production (Coolify / Docker) — checklist
 
-L’erreur `failed_to_load_clerk_js` (écran blanc sur `/sign-in`) vient le plus souvent d’une clé `NEXT_PUBLIC_*` **absente au build** (Next l’inline dans le bundle client).
+L’erreur `failed_to_load_clerk_js` (écran blanc sur `/sign-in`) a **deux causes** fréquentes :
 
-1. **Instance Clerk Production** avec clés `pk_live_` / `sk_live_` (ne pas mélanger test + live).
-2. Dans Clerk → **Domains / Allowed origins** : ajouter `https://hello-pomelo.duckdns.org` (et paths sign-in / dashboard).
-3. Coolify : définir les variables **aussi en Build-time / Build Args**, pas seulement Runtime :
+**A. Clé `NEXT_PUBLIC_*` absente au build** (Next l’inline dans le bundle client).
+
+1. Instance Clerk **Production** (`pk_live_` / `sk_live_`) — ne pas mélanger test + live.
+2. Clerk → **Domains / Allowed origins** : `https://hello-pomelo.duckdns.org`.
+3. Coolify : variables aussi en **Build-time / Build Args** (pas seulement Runtime) :
    - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
    - `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`
    - `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up`
    - Runtime : `CLERK_SECRET_KEY` (+ les mêmes `NEXT_PUBLIC_*` si besoin serveur)
-4. **Rebuild** l’image après avoir ajouté les build-args (un redémarrage seul ne suffit pas).
-5. Vérifier que le navigateur peut joindre le CDN Clerk (pas de bloqueur / CSP trop stricte).
+4. **Rebuild** l’image après ajout des build-args (un redémarrage seul ne suffit pas).
 
-Le `Dockerfile` déclare ces `ARG` / `ENV` avant `npm run build`.
+**B. Domaine Clerk custom cassé** (`clerk.hello-pomelo.duckdns.org`).
+
+Une clé live peut encoder un Frontend API custom. Si ce DNS pointe vers
+Coolify/Traefik (certificat `TRAEFIK DEFAULT CERT` + HTTP 503), le navigateur
+refuse de charger `clerk.browser.js`.
+
+Correctif (domaine Clerk **par défaut**) :
+
+1. Clerk Dashboard → désactiver le custom Frontend API domain.
+2. Copier les **nouvelles** clés (`pk_live_` / `sk_live_`) qui pointent vers
+   `*.clerk.accounts.dev` (plus vers `clerk.hello-pomelo.duckdns.org`).
+3. Coolify : mettre à jour build-args **et** runtime, puis **Rebuild**.
+4. Un enregistrement DNS orphelin `clerk.hello-pomelo` vers le VPS est
+   **sans impact** tant que la publishable key n’encode plus ce host.
+
+Vérification post-deploy :
+
+```bash
+curl -sL https://hello-pomelo.duckdns.org/sign-in \
+  | rg -o 'src="https://[^"]+clerk[^"]+"|data-clerk-publishable-key="[^"]+"'
+```
+
+Attendu : script sur `*.clerk.accounts.dev` (pas `clerk.hello-pomelo.duckdns.org`).
+
+Le `Dockerfile` déclare déjà les `ARG` / `ENV` avant `npm run build`.
 
 ---
 
