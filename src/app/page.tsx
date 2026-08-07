@@ -24,7 +24,6 @@ import {
 type QuestionCard = {
   href: string;
   title: string;
-  status: string;
   summary: string;
   points: string[];
   cta: string;
@@ -35,7 +34,6 @@ const questions: QuestionCard[] = [
   {
     href: "/customer-history",
     title: "Question 1 - Historique client",
-    status: "Livré",
     summary:
       "Vue consolidée pour un gestionnaire relation client : patterns d’achat lisibles, sans logique métier collée à l’UI.",
     points: [
@@ -50,7 +48,6 @@ const questions: QuestionCard[] = [
   {
     href: "/pricing",
     title: "Question 2 - Moteur de pricing",
-    status: "Livré",
     summary:
       "Moteur de règles extensible : dépendances, priorités et impact de chaque règle sur le prix final.",
     points: [
@@ -65,7 +62,6 @@ const questions: QuestionCard[] = [
   {
     href: "/portal",
     title: "Question 3 - Portail & SSO",
-    status: "Livré",
     summary:
       "Proposition d’architecture pour un portail unifié (RH, CRM, Finance, Projets) avec SSO et shell produit.",
     points: [
@@ -120,12 +116,7 @@ export default function HomePage() {
               className="h-full transition-colors hover:ring-secondary/30"
             >
               <CardHeader className="gap-2">
-                <div className="flex items-center justify-between gap-2">
-                  <item.icon className="text-secondary size-5" />
-                  <span className="text-muted-foreground rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase">
-                    {item.status}
-                  </span>
-                </div>
+                <item.icon className="text-secondary size-5" />
                 <CardTitle className="text-base leading-snug">
                   {item.title}
                 </CardTitle>
