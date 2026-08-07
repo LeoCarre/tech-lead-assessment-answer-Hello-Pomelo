@@ -80,16 +80,32 @@ Ouvrir [http://localhost:3000](http://localhost:3000).
 
 ## SSO Clerk
 
-Renseigner les clés dans `.env` (voir [`.env.example`](.env.example)) :
+Renseigner les clés (voir [`.env.example`](.env.example)) :
 
 ```bash
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_…   # ou pk_test_… en local
+CLERK_SECRET_KEY=sk_live_…                   # ou sk_test_…
 ```
 
 - Session : `src/proxy.ts` (`clerkMiddleware`)
 - Protection resource-based : `auth.protect()` dans `src/app/dashboard/layout.tsx`
-- Sans clés Clerk, `/dashboard` redirige vers `/portal`
+- Sans clé publishable au **build**, `/dashboard` / `/sign-in` ne peuvent pas charger Clerk JS
+
+### Production (Coolify / Docker) — checklist
+
+L’erreur `failed_to_load_clerk_js` (écran blanc sur `/sign-in`) vient le plus souvent d’une clé `NEXT_PUBLIC_*` **absente au build** (Next l’inline dans le bundle client).
+
+1. **Instance Clerk Production** avec clés `pk_live_` / `sk_live_` (ne pas mélanger test + live).
+2. Dans Clerk → **Domains / Allowed origins** : ajouter `https://hello-pomelo.duckdns.org` (et paths sign-in / dashboard).
+3. Coolify : définir les variables **aussi en Build-time / Build Args**, pas seulement Runtime :
+   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+   - `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`
+   - `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up`
+   - Runtime : `CLERK_SECRET_KEY` (+ les mêmes `NEXT_PUBLIC_*` si besoin serveur)
+4. **Rebuild** l’image après avoir ajouté les build-args (un redémarrage seul ne suffit pas).
+5. Vérifier que le navigateur peut joindre le CDN Clerk (pas de bloqueur / CSP trop stricte).
+
+Le `Dockerfile` déclare ces `ARG` / `ENV` avant `npm run build`.
 
 ---
 
@@ -137,7 +153,9 @@ docker run -p 3000:3000 hello-pomelo-assessment
 
 Healthcheck : `GET /api/health`.
 
-Compatible Coolify : fournir les variables Clerk en production si le dashboard doit rester protégé.
+Compatible Coolify : fournir `CLERK_SECRET_KEY` en runtime **et**
+`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` (et URLs sign-in/up) en **build-args**,
+puis rebuild. Sinon Clerk JS échoue (`failed_to_load_clerk_js`).
 
 ---
 
