@@ -93,44 +93,41 @@ CLERK_SECRET_KEY=sk_live_…                   # ou sk_test_…
 
 ### Production (Coolify / Docker) — checklist
 
-L’erreur `failed_to_load_clerk_js` (écran blanc sur `/sign-in`) a **deux causes** fréquentes :
+DuckDNS ne permet en général **pas** de CNAME Clerk correct. On proxye la
+Frontend API via notre domaine (`/__clerk`) — TLS Let’s Encrypt du site.
 
-**A. Clé `NEXT_PUBLIC_*` absente au build** (Next l’inline dans le bundle client).
+**Local** : ne pas définir `NEXT_PUBLIC_CLERK_PROXY_URL` (clés `pk_test_` → `*.clerk.accounts.dev`).
 
-1. Instance Clerk **Production** (`pk_live_` / `sk_live_`) — ne pas mélanger test + live.
-2. Clerk → **Domains / Allowed origins** : `https://hello-pomelo.duckdns.org`.
-3. Coolify : variables aussi en **Build-time / Build Args** (pas seulement Runtime) :
-   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+**Prod** :
+
+1. Clerk → Domains : domaine d’app = `hello-pomelo.duckdns.org`.
+2. Frontend API → **Set proxy configuration** :
+   `https://hello-pomelo.duckdns.org/__clerk`
+   (Clerk valide que le proxy répond avant d’activer.)
+3. Coolify — **Build-time** + runtime :
+   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` = `pk_live_…`
+   - `CLERK_SECRET_KEY` = `sk_live_…`
    - `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`
    - `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up`
-   - Runtime : `CLERK_SECRET_KEY` (+ les mêmes `NEXT_PUBLIC_*` si besoin serveur)
-4. **Rebuild** l’image après ajout des build-args (un redémarrage seul ne suffit pas).
+   - `NEXT_PUBLIC_CLERK_PROXY_URL=/__clerk`
+4. **Rebuild** (obligatoire : `NEXT_PUBLIC_*` inlinées au build).
 
-**B. Domaine Clerk custom cassé** (`clerk.hello-pomelo.duckdns.org`).
-
-Une clé live peut encoder un Frontend API custom. Si ce DNS pointe vers
-Coolify/Traefik (certificat `TRAEFIK DEFAULT CERT` + HTTP 503), le navigateur
-refuse de charger `clerk.browser.js`.
-
-Correctif (domaine Clerk **par défaut**) :
-
-1. Clerk Dashboard → désactiver le custom Frontend API domain.
-2. Copier les **nouvelles** clés (`pk_live_` / `sk_live_`) qui pointent vers
-   `*.clerk.accounts.dev` (plus vers `clerk.hello-pomelo.duckdns.org`).
-3. Coolify : mettre à jour build-args **et** runtime, puis **Rebuild**.
-4. Un enregistrement DNS orphelin `clerk.hello-pomelo` vers le VPS est
-   **sans impact** tant que la publishable key n’encode plus ce host.
+Le middleware (`src/proxy.ts`) active `frontendApiProxy` seulement si
+`NEXT_PUBLIC_CLERK_PROXY_URL` est défini.
 
 Vérification post-deploy :
 
 ```bash
 curl -sL https://hello-pomelo.duckdns.org/sign-in \
-  | rg -o 'src="https://[^"]+clerk[^"]+"|data-clerk-publishable-key="[^"]+"'
+  | rg -o 'src="[^"]+clerk[^"]+"|data-clerk-proxy-url="[^"]+"'
 ```
 
-Attendu : script sur `*.clerk.accounts.dev` (pas `clerk.hello-pomelo.duckdns.org`).
+Attendu : script via `/__clerk/npm/@clerk/clerk-js@…` (même origine),
+**pas** `https://clerk.hello-pomelo.duckdns.org/...`.
 
-Le `Dockerfile` déclare déjà les `ARG` / `ENV` avant `npm run build`.
+Le DNS orphelin `clerk.hello-pomelo` → VPS peut rester : il n’est plus utilisé.
+
+Le `Dockerfile` déclare les `ARG` / `ENV` (dont le proxy) avant `npm run build`.
 
 ---
 

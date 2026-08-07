@@ -1,6 +1,9 @@
 import { ClerkProvider } from "@clerk/nextjs";
 
-import { isClerkPublishableConfigured } from "@/lib/clerk";
+import {
+  getClerkProxyUrl,
+  isClerkPublishableConfigured,
+} from "@/lib/clerk";
 
 export function isClerkEnabled() {
   return isClerkPublishableConfigured();
@@ -16,11 +19,14 @@ export function AuthProvider({
     return children;
   }
 
+  const proxyUrl = getClerkProxyUrl();
+
   return (
     <ClerkProvider
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
       afterSignOutUrl="/portal"
+      {...(proxyUrl ? { proxyUrl } : {})}
     >
       {children}
     </ClerkProvider>
