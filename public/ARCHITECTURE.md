@@ -1,4 +1,4 @@
-# Architecture — Portail unifié & SSO (Question 3)
+# Architecture - Portail unifié & SSO (Question 3)
 
 Document d’architecture pour un **dashboard / portail d’entreprise** donnant accès aux applications métier existantes (RH, CRM, Finance, Projets), avec **SSO**, sans repartir d’un greenfield microservices.
 
@@ -13,7 +13,7 @@ Ce dépôt illustre la proposition : landing `/portal`, shell `/dashboard`, IdP 
 3. [Vue d’ensemble](#3-vue-densemble)
 4. [Stack technique du dashboard](#4-stack-technique-du-dashboard)
 5. [Cartographie des domaines dans le shell](#5-cartographie-des-domaines-dans-le-shell)
-6. [SSO — choix, justification, alternatives](#6-sso--choix-justification-alternatives)
+6. [SSO - choix, justification, alternatives](#6-sso--choix-justification-alternatives)
 7. [Authentication vs authorization](#7-authentication-vs-authorization)
 8. [Stratégie session / tokens](#8-stratégie-session--tokens)
 9. [RBAC & permissions](#9-rbac--permissions)
@@ -91,7 +91,7 @@ Identity                  →  IdP OIDC (Clerk en démo)
 ```text
                          ┌─────────────────────────┐
                          │   Identity Provider      │
-                         │   Clerk (OIDC) — démo    │
+                         │   Clerk (OIDC) - démo    │
                          │   (Entra / Okta / …)     │
                          └────────────┬────────────┘
                                       │ SSO
@@ -145,7 +145,7 @@ Pour cet assessment (et pour un portail d’intégration V1), Next.js regroupe :
 - déploiement unique ;
 - partage des types TypeScript.
 
-Une séparation front/API reste possible plus tard si les équipes ou le scaling l’exigent — ce n’est pas un prérequis.
+Une séparation front/API reste possible plus tard si les équipes ou le scaling l’exigent - ce n’est pas un prérequis.
 
 ### Pourquoi pas de microservices « portail » ?
 
@@ -179,7 +179,7 @@ Le shell démontre une navigation **par environnement métier**, plus un **espac
 
 ---
 
-## 6. SSO — choix, justification, alternatives
+## 6. SSO - choix, justification, alternatives
 
 ### 6.1 Choix retenu pour la démo : Clerk
 
@@ -265,17 +265,17 @@ Options selon maturité de chaque app :
 
 ### 9.1 Modèle progressif
 
-**Phase A — Portail (rapide)**
+**Phase A - Portail (rapide)**
 
 - Rôles dans Clerk Organizations ou `publicMetadata` : `employee`, `manager`, `finance`, `admin`.
 - Mapping rôle → environnements visibles dans le switcher / sidebar.
 
-**Phase B — BFF**
+**Phase B - BFF**
 
 - Vérifier le rôle avant d’appeler une API sensible.
 - Filtrer les champs (PII, salaires) selon le rôle.
 
-**Phase C — Apps métier**
+**Phase C - Apps métier**
 
 - Authz fine inchangée / renforcée dans chaque system of record.
 - Le portail ne court-circuite jamais les contrôles RH/Finance.
@@ -284,9 +284,9 @@ Options selon maturité de chaque app :
 
 | Rôle | Espace partagé | RH | CRM | Finance | Projets |
 | --- | --- | --- | --- | --- | --- |
-| employee | lecture | self-service | — | — | ses tâches |
-| manager | lecture | équipe | lecture | — | équipe |
-| finance | lecture | — | lecture | full | — |
+| employee | lecture | self-service | - | - | ses tâches |
+| manager | lecture | équipe | lecture | - | équipe |
+| finance | lecture | - | lecture | full | - |
 | admin | full | full | full | full | full |
 
 ---
@@ -298,7 +298,7 @@ Options selon maturité de chaque app :
 - Authentifier la requête (session Clerk).
 - Autoriser (rôle / domaine).
 - Appeler les APIs métier avec le bon token.
-- **Normaliser** les JSON hétérogènes (anti-corruption layer — même idée que Q1).
+- **Normaliser** les JSON hétérogènes (anti-corruption layer - même idée que Q1).
 - Agréger pour le dashboard unifié (KPI cross-domaines).
 - Appliquer timeouts, retries bornés, cache court si pertinent.
 
@@ -320,7 +320,7 @@ Objectif : **dégradation locale**, pas panne globale.
 
 | Stratégie | Détail |
 | --- | --- |
-| Timeouts par domaine | Ex. RH 2s, Finance 3s — pas de wait infini |
+| Timeouts par domaine | Ex. RH 2s, Finance 3s - pas de wait infini |
 | Circuit breaker léger | Couper temporairement un domaine en erreur |
 | UI compartimentée | Widget Finance en erreur ≠ sidebar bloquée |
 | Bulkheads | Pas de file d’attente unique pour tous les domaines |
@@ -338,7 +338,7 @@ Le dashboard unifié doit afficher des états partiels (3 domaines OK / 1 KO) pl
 | Metrics | Latence BFF par domaine, taux d’erreur, taux de sign-in |
 | Tracing | Propagation `traceparent` BFF → apps |
 | Alerting | Spike 5xx sur un domaine, échecs auth IdP |
-| Audit | Accès aux données sensibles (Finance / Paie) — stockage portail optionnel |
+| Audit | Accès aux données sensibles (Finance / Paie) - stockage portail optionnel |
 
 Le `requestId` généré au edge (proxy / layout) doit suivre tout le chemin.
 
@@ -348,7 +348,7 @@ Le `requestId` généré au edge (proxy / layout) doit suivre tout le chemin.
 
 | Sujet | Mesure |
 | --- | --- |
-| Secrets | Uniquement env (Coolify) — jamais commités (`.env` gitignoré) |
+| Secrets | Uniquement env (Coolify) - jamais commités (`.env` gitignoré) |
 | Cookies session | Secure, HttpOnly, SameSite (géré Clerk) |
 | CSRF | Patterns Next + cookies SameSite ; actions mutantes côté serveur |
 | CSP | Restreindre scripts / frames (surtout si iframe apps) |
@@ -381,7 +381,7 @@ Le portail est **stateless** au niveau process : horizontal scaling simple derri
 | --- | --- |
 | Portail / BFF | Horizontal (instances Next.js) |
 | IdP | SaaS (Clerk) ou cluster IdP enterprise |
-| Apps métier | Indépendant — le portail ne dicte pas leur scaling |
+| Apps métier | Indépendant - le portail ne dicte pas leur scaling |
 | Cache | Court TTL sur agrégats dashboard ; invalidation par domaine |
 | Pic de login | Géré côté IdP ; le BFF reste léger |
 

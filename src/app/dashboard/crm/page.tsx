@@ -13,7 +13,7 @@ export default function CrmHomePage() {
       <PortalPageHeader
         eyebrow="App CRM"
         title="Relation client"
-        description="Clients, opportunités et devis — portail d’accès à l’app CRM."
+        description="Clients, opportunités et devis - portail d’accès à l’app CRM."
       />
       <KpiGrid
         items={[

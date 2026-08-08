@@ -22,19 +22,19 @@ import {
 const domains = [
   {
     title: "App RH",
-    text: "Employés, congés, paie — system of record existant, non réécrit.",
+    text: "Employés, congés, paie - system of record existant, non réécrit.",
   },
   {
     title: "App CRM",
-    text: "Clients, opportunités, devis — intégrée via BFF / adaptateurs.",
+    text: "Clients, opportunités, devis - intégrée via BFF / adaptateurs.",
   },
   {
     title: "App Finance",
-    text: "Comptabilité, factures, reporting — isolation d’erreurs par domaine.",
+    text: "Comptabilité, factures, reporting - isolation d’erreurs par domaine.",
   },
   {
     title: "App Projets",
-    text: "Tâches, planning, time tracking — même shell, même SSO.",
+    text: "Tâches, planning, time tracking - même shell, même SSO.",
   },
 ];
 
@@ -57,7 +57,7 @@ const pillars = [
   {
     icon: Workflow,
     title: "BFF d’intégration",
-    text: "Agrégation, normalisation DTO, secrets côté serveur — pas d’accès direct browser → apps.",
+    text: "Agrégation, normalisation DTO, secrets côté serveur - pas d’accès direct browser → apps.",
   },
   {
     icon: Eye,
@@ -107,7 +107,7 @@ export default function PortalArchitecturePage() {
       <section className="space-y-3">
         <h2 className="text-base font-semibold">Infrastructure existante</h2>
         <p className="text-muted-foreground text-sm leading-relaxed">
-          Quatre <em>systems of record</em> indépendants — le portail est le{" "}
+          Quatre <em>systems of record</em> indépendants - le portail est le{" "}
           <em>system of engagement</em>, pas un ERP de remplacement.
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -143,7 +143,7 @@ export default function PortalArchitecturePage() {
       <section className="space-y-3">
         <h2 className="text-base font-semibold">Vue logique</h2>
         <pre className="bg-muted/60 overflow-x-auto rounded-lg border p-4 font-mono text-[11px] leading-relaxed">
-{`Identity Provider (Clerk — OIDC démo)
+{`Identity Provider (Clerk - OIDC démo)
               |
              SSO
               |

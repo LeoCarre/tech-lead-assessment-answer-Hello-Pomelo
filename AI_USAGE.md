@@ -17,21 +17,21 @@ Ce document décrit l’usage réel de l’IA pendant le rendu du Tech Lead Asse
 - Scaffold Next.js 16 + React 19 + TypeScript + Tailwind v4 + Vitest + Docker (Coolify / standalone)
 - Landing assessment, fil d’Ariane, page 404, assets brand sous `public/brand`
 
-### Q1 — Historique client
+### Q1 - Historique client
 
 - Domaine : cents entiers, fenêtre 6 mois, granularité semaine/mois, anomalies, normalisation JSON à la frontière infra
 - Application + API `GET /api/customers/:id/history`
 - Dashboard pilotage (KPI, filtres clients, badges, tris colonnes, patterns multi-clients) et vue rapport
 - Tests Vitest (périodes, évolution, anomalies, cas limites)
 
-### Q2 — Pricing
+### Q2 - Pricing
 
 - Engine par phases (base → conditionnel → catégorie → cumulatif / réévaluation bornée → final)
 - Boutique e-commerce + workbench technique avec **session partagée** (panier / profil / options synchronisés)
 - Totaux HT / taxes détaillées / TTC, règles appliquées repliables, options panier (1ʳᵉ commande, express)
 - Tests Vitest du moteur
 
-### Q3 — Portail & SSO
+### Q3 - Portail & SSO
 
 - `ARCHITECTURE.md` (portail, BFF, authn ≠ authz, Clerk en démo OIDC)
 - Shell `/dashboard` multi-environnements (Espace partagé, RH, CRM, Finance, Projets) + pages métier démo

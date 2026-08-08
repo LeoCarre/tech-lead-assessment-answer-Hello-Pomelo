@@ -10,7 +10,7 @@ export default function ProjectsTimePage() {
       <PortalPageHeader
         eyebrow="App Projets · Time tracking"
         title="Saisie de temps"
-        description="Heures facturables vs internes — sync app projets."
+        description="Heures facturables vs internes - sync app projets."
       />
       <KpiGrid
         items={[

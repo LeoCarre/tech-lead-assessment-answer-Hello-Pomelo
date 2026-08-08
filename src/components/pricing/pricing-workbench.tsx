@@ -348,7 +348,7 @@ export function PricingWorkbench({
                       <TableCell>
                         <div className="font-medium">{line.name}</div>
                         <div className="text-muted-foreground text-xs">
-                          {line.categories.join(", ") || "—"}
+                          {line.categories.join(", ") || "-"}
                         </div>
                       </TableCell>
                       <TableCell>{line.quantity}</TableCell>

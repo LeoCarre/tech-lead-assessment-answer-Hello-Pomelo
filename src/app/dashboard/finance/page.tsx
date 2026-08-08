@@ -13,7 +13,7 @@ export default function FinanceHomePage() {
       <PortalPageHeader
         eyebrow="App Finance"
         title="Comptabilité & reporting"
-        description="Grand livre, factures et reporting — portail vers l’app finance."
+        description="Grand livre, factures et reporting - portail vers l’app finance."
       />
       <KpiGrid
         items={[

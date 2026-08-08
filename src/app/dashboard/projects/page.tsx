@@ -13,7 +13,7 @@ export default function ProjectsHomePage() {
       <PortalPageHeader
         eyebrow="App Projets"
         title="Delivery & planning"
-        description="Tâches, planning et time tracking — portail vers l’app projets."
+        description="Tâches, planning et time tracking - portail vers l’app projets."
       />
       <KpiGrid
         items={[

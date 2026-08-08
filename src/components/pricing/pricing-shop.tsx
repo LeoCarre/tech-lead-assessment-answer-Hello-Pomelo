@@ -529,7 +529,7 @@ function CheckoutConfirm({
         </p>
         <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
           Confirmez la commande. Les règles et totaux restent dans le pied de
-          panier — comme sur l’étape précédente.
+          panier - comme sur l’étape précédente.
         </p>
       </div>
 

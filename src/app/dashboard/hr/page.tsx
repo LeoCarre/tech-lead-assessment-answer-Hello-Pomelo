@@ -13,7 +13,7 @@ export default function HrHomePage() {
       <PortalPageHeader
         eyebrow="App RH"
         title="Gestion des ressources humaines"
-        description="Employés, congés et paie — surface portail branchée sur l’app RH existante."
+        description="Employés, congés et paie - surface portail branchée sur l’app RH existante."
       />
       <KpiGrid
         items={[

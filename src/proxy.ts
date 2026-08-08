@@ -5,7 +5,7 @@ import { isClerkConfigured, isClerkProxyEnabled } from "@/lib/clerk";
 
 /**
  * Clerk middleware keeps the session alive.
- * Auth gates live on resources (see dashboard/layout), not path matchers —
+ * Auth gates live on resources (see dashboard/layout), not path matchers -
  * `createRouteMatcher` is deprecated.
  *
  * When `NEXT_PUBLIC_CLERK_PROXY_URL` is set (production Coolify), Frontend API

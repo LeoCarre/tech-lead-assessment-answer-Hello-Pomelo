@@ -10,7 +10,7 @@ export default function HrPayrollPage() {
       <PortalPageHeader
         eyebrow="App RH · Paie"
         title="Cycles de paie"
-        description="Suivi des cycles et variables — données en lecture depuis l’app paie."
+        description="Suivi des cycles et variables - données en lecture depuis l’app paie."
       />
       <KpiGrid
         items={[
