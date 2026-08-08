@@ -238,7 +238,8 @@ export const categoryTaxRule: PricingRule = {
 
 /**
  * > 3 units in the same category → -10 % on those units' lines.
- * Quantity is summed across lines sharing the category.
+ * Quantity is summed across lines sharing the (normalized) category.
+ * Threshold is strict: exactly 3 units do not trigger.
  */
 export const bulkCategoryDiscountRule: PricingRule = {
   id: "cumulative-bulk-category",
@@ -279,7 +280,7 @@ export const bulkCategoryDiscountRule: PricingRule = {
           ruleName: "Remise volume catégorie (> 3) (-10 %)",
           phase: "cumulative",
           impactCents,
-          detail: `Catégories concernées : ${[...discountedCategories].join(", ") || "—"}.`,
+          detail: `Catégories concernées : ${[...discountedCategories].join(", ") || "-"}.`,
         },
       ],
     };

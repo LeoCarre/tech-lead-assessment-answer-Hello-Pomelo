@@ -133,12 +133,53 @@ describe("pricing engine - category tax", () => {
 });
 
 describe("pricing engine - cumulative reevaluation", () => {
+  it("should_apply_10_percent_when_more_than_3_same_category", () => {
+    const result = calculatePrice({
+      customerType: "Standard",
+      isFirstOrderOfMonth: false,
+      expressDelivery: false,
+      lines: [
+        line({
+          productId: "P006",
+          euros: 100,
+          quantity: 4,
+          categories: ["Électronique"],
+        }),
+      ],
+    });
+
+    expect(
+      result.appliedRules.some((r) => r.ruleId === "cumulative-bulk-category")
+    ).toBe(true);
+    // 400 → tax 20% = 480 → bulk -10% = 432
+    expect(result.finalPriceCents).toBe(eurosToCents(432));
+  });
+
+  it("should_not_apply_bulk_discount_at_exactly_3_same_category", () => {
+    const result = calculatePrice({
+      customerType: "Standard",
+      isFirstOrderOfMonth: false,
+      expressDelivery: false,
+      lines: [
+        line({
+          productId: "P006",
+          euros: 100,
+          quantity: 3,
+          categories: ["Électronique"],
+        }),
+      ],
+    });
+
+    expect(
+      result.appliedRules.some((r) => r.ruleId === "cumulative-bulk-category")
+    ).toBe(false);
+    // 300 → tax 20% = 360 (no bulk)
+    expect(result.finalPriceCents).toBe(eurosToCents(360));
+  });
+
   it("should_cancel_500_threshold_when_recursive_discount_crosses_below_500", () => {
-    // After base: 520. Conditional -5% => 494. But wait we need >500 after base.
-    // Base 520 → conditional 494. Then bulk? Need qty >3 same category.
-    // Better: 4 units of 140 = 560 after base. Conditional -5% = 532. Tax 0.
-    // Bulk -10% on all = 478.8 < 500 → cancel conditional, replay:
-    // 560, no conditional, bulk -10% = 504.
+    // 4×140 = 560 after base → conditional -5% = 532 → bulk -10% = 478.8 < 500
+    // → cancel conditional, replay: 560 → bulk -10% = 504
     const input: PricingOrderInput = {
       customerType: "Standard",
       isFirstOrderOfMonth: false,
@@ -163,7 +204,6 @@ describe("pricing engine - cumulative reevaluation", () => {
         (r) => r.ruleId === "reeval-cancel-conditional-500"
       )
     ).toBe(true);
-    // 4×140 = 560 → pas de seuil 500 → bulk -10 % = 504
     expect(result.finalPriceCents).toBe(eurosToCents(504));
   });
 });

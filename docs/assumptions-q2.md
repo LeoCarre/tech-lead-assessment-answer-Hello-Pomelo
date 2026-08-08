@@ -27,7 +27,9 @@
 
 ## Cumulative / re-evaluation
 
-- If the **sum of quantities** sharing a normalized category is **> 3**, those lines get **-10 %**.
+- If the **sum of quantities** sharing a normalized category is **> 3** (strict), those lines get **-10 %**.
+  - Exactly **3** units does **not** trigger; from **4** units onward it does.
+  - Quantities are summed across cart lines for each normalized category key.
 - If after this discount the **pre-final** total is **< 500 €** while `conditional-500` was active, that rule is **cancelled** and pre-final phases are **replayed**.
 - Replays are capped (`MAX_REEVALUATIONS = 2`) to guarantee termination.
 

@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="public/brand/LeoCarre-TechLead-Assessment.png" alt="Hello Pomelo — Tech Lead Assessment" width="100%" />
+  <img src="public/brand/LeoCarre-TechLead-Assessment.png" alt="Hello Pomelo - Tech Lead Assessment" width="100%" />
 </p>
 
-<h1 align="center">Hello Pomelo — Tech Lead Assessment</h1>
+<h1 align="center">Hello Pomelo - Tech Lead Assessment</h1>
 
 <p align="center">
   Rendu du case Tech Lead&nbsp;: historique client, moteur de pricing, portail unifié avec SSO.
@@ -28,7 +28,7 @@
 
 ## Livrables
 
-### Question 1 — Historique client
+### Question 1 - Historique client
 
 Vue consolidée pour un gestionnaire relation client : patterns d’achat, granularité dynamique (semaine / mois), anomalies, montants en **cents entiers**.
 
@@ -37,16 +37,17 @@ Vue consolidée pour un gestionnaire relation client : patterns d’achat, granu
 - API : `GET /api/customers/:id/history`
 - Assumptions : [`docs/assumptions-q1.md`](docs/assumptions-q1.md)
 
-### Question 2 — Moteur de pricing
+### Question 2 - Moteur de pricing
 
 Engine par phases (base → conditionnel → catégorie → cumulatif / réévaluation → final), boutique e-commerce et workbench synchronisés.
 
 - Domaine : `src/domain/pricing`
 - UI : [`/pricing`](http://localhost:3000/pricing) (boutique + workbench)
 - Assumptions : [`docs/assumptions-q2.md`](docs/assumptions-q2.md)
+- Cahier de tests : [`docs/cahier-tests-q2.md`](docs/cahier-tests-q2.md)
 - Tests : `tests/unit/pricing-engine.test.ts`
 
-### Question 3 — Portail unifié & SSO
+### Question 3 - Portail unifié & SSO
 
 Portail Next.js avec environnements RH / CRM / Finance / Projets, dashboard unifié et authentification Clerk (OIDC).
 
@@ -67,14 +68,14 @@ npm run dev
 
 Ouvrir [http://localhost:3000](http://localhost:3000).
 
-| Route | Contenu |
-| --- | --- |
-| `/` | Accueil assessment |
-| `/customer-history` | Q1 — historique client |
-| `/pricing` | Q2 — boutique + workbench |
-| `/portal` | Q3 — architecture & SSO |
-| `/dashboard` | Q3 — shell portail (Clerk) |
-| `/sign-in` · `/sign-up` | Auth Clerk |
+| Route                   | Contenu                    |
+| ----------------------- | -------------------------- |
+| `/`                     | Accueil assessment         |
+| `/customer-history`     | Q1 - historique client     |
+| `/pricing`              | Q2 - boutique + workbench  |
+| `/portal`               | Q3 - architecture & SSO    |
+| `/dashboard`            | Q3 - shell portail (Clerk) |
+| `/sign-in` · `/sign-up` | Auth Clerk                 |
 
 ---
 
@@ -95,32 +96,32 @@ CLERK_SECRET_KEY=sk_test_…                   # sk_live_… en production
 
 ## Stack & architecture
 
-| Couche | Choix |
-| --- | --- |
-| App | Next.js 16 (App Router), React 19, TypeScript |
-| UI | Tailwind v4, shadcn / Base UI |
-| Tests | Vitest |
-| Auth | `@clerk/nextjs` (démo SSO) |
-| Deploy | Docker multi-stage (`output: "standalone"`) |
+| Couche | Choix                                         |
+| ------ | --------------------------------------------- |
+| App    | Next.js 16 (App Router), React 19, TypeScript |
+| UI     | Tailwind v4, shadcn / Base UI                 |
+| Tests  | Vitest                                        |
+| Auth   | `@clerk/nextjs` (démo SSO)                    |
+| Deploy | Docker multi-stage (`output: "standalone"`)   |
 
 Documents utiles :
 
-- [`ARCHITECTURE.md`](ARCHITECTURE.md) — portail, BFF, authn vs authz
-- [`DESIGN.md`](DESIGN.md) — tokens Hello Pomelo
-- [`docs/GIT_WORKFLOW.md`](docs/GIT_WORKFLOW.md) — Conventional Commits
+- [`ARCHITECTURE.md`](ARCHITECTURE.md) - portail, BFF, authn vs authz
+- [`DESIGN.md`](DESIGN.md) - tokens Hello Pomelo
+- [`docs/GIT_WORKFLOW.md`](docs/GIT_WORKFLOW.md) - Conventional Commits
 - [`docs/assumptions-q1.md`](docs/assumptions-q1.md) / [`docs/assumptions-q2.md`](docs/assumptions-q2.md)
 
 ---
 
 ## Qualité
 
-| Script | Rôle |
-| --- | --- |
-| `npm run dev` | Serveur de développement |
-| `npm run build` / `npm start` | Build & prod |
-| `npm test` | Tests unitaires |
-| `npm run typecheck` | TypeScript |
-| `npm run lint` | ESLint |
+| Script                        | Rôle                     |
+| ----------------------------- | ------------------------ |
+| `npm run dev`                 | Serveur de développement |
+| `npm run build` / `npm start` | Build & prod             |
+| `npm test`                    | Tests unitaires          |
+| `npm run typecheck`           | TypeScript               |
+| `npm run lint`                | ESLint                   |
 
 Avant chaque commit logique : tests + typecheck + lint (voir [`docs/GIT_WORKFLOW.md`](docs/GIT_WORKFLOW.md)).
 
