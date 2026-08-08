@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/brand/leo-hello-pomelo.png" alt="Hello Pomelo" width="120" />
+  <img src="public/brand/LeoCarre-TechLead-Assessment.png" alt="Hello Pomelo — Tech Lead Assessment" width="100%" />
 </p>
 
 <h1 align="center">Hello Pomelo — Tech Lead Assessment</h1>
@@ -83,52 +83,13 @@ Ouvrir [http://localhost:3000](http://localhost:3000).
 Renseigner les clés (voir [`.env.example`](.env.example)) :
 
 ```bash
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_…   # ou pk_test_… en local
-CLERK_SECRET_KEY=sk_live_…                   # ou sk_test_…
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_…   # pk_live_… en production
+CLERK_SECRET_KEY=sk_test_…                   # sk_live_… en production
 ```
 
 - Session : `src/proxy.ts` (`clerkMiddleware`)
 - Protection resource-based : `auth.protect()` dans `src/app/dashboard/layout.tsx`
-- Sans clé publishable au **build**, `/dashboard` / `/sign-in` ne peuvent pas charger Clerk JS
-
-### Production (Coolify / Docker) — checklist
-
-DuckDNS ne permet en général **pas** de CNAME Clerk correct. On proxye la
-Frontend API via notre domaine (`/__clerk`) — TLS Let’s Encrypt du site.
-
-**Local** : clés `pk_test_` → pas de proxy (`*.clerk.accounts.dev`).
-
-**Prod** : avec `pk_live_`, le code active **automatiquement** le proxy `/__clerk`
-(pas besoin d’oublier le build-arg). Optionnel : forcer
-`NEXT_PUBLIC_CLERK_PROXY_URL=/__clerk` en Coolify.
-
-1. Clerk → Domains : domaine d’app = `hello-pomelo.duckdns.org`.
-2. Frontend API → **Set proxy configuration** :
-   `https://hello-pomelo.duckdns.org/__clerk`
-   (à faire **après** le rebuild, Clerk valide le endpoint).
-3. Coolify — **Build-time** + runtime :
-   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` = `pk_live_…`
-   - `CLERK_SECRET_KEY` = `sk_live_…`
-   - `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`
-   - `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up`
-4. **Rebuild** (obligatoire : `NEXT_PUBLIC_*` inlinées au build).
-
-Le middleware (`src/proxy.ts`) active `frontendApiProxy` dès qu’un proxy URL
-est résolu (`pk_live_` ou env explicite).
-
-Vérification post-deploy :
-
-```bash
-curl -sL https://hello-pomelo.duckdns.org/sign-in \
-  | rg -o 'src="[^"]+clerk[^"]+"|data-clerk-proxy-url="[^"]+"'
-```
-
-Attendu : script via `/__clerk/npm/@clerk/clerk-js@…` (même origine),
-**pas** `https://clerk.hello-pomelo.duckdns.org/...`.
-
-Le DNS orphelin `clerk.hello-pomelo` → VPS peut rester : il n’est plus utilisé.
-
-Le `Dockerfile` déclare les `ARG` / `ENV` (dont le proxy) avant `npm run build`.
+- En production (`pk_live_`), la Frontend API est proxifiée via `/__clerk` (voir `Dockerfile` pour les `NEXT_PUBLIC_*` au build)
 
 ---
 
@@ -140,7 +101,7 @@ Le `Dockerfile` déclare les `ARG` / `ENV` (dont le proxy) avant `npm run build`
 | UI | Tailwind v4, shadcn / Base UI |
 | Tests | Vitest |
 | Auth | `@clerk/nextjs` (démo SSO) |
-| Deploy | Docker multi-stage, Coolify-ready |
+| Deploy | Docker multi-stage (`output: "standalone"`) |
 
 Documents utiles :
 
@@ -167,39 +128,19 @@ Avant chaque commit logique : tests + typecheck + lint (voir [`docs/GIT_WORKFLOW
 
 ## Déploiement
 
-Image Docker multi-stage (`Dockerfile`, `output: "standalone"`).
+Image Docker multi-stage (`Dockerfile`).
 
 ```bash
-docker build -t hello-pomelo-assessment .
-docker run -p 3000:3000 hello-pomelo-assessment
+docker build -t hello-pomelo-assessment \
+  --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_… \
+  .
+docker run -p 3000:3000 \
+  -e CLERK_SECRET_KEY=sk_live_… \
+  -e NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_… \
+  hello-pomelo-assessment
 ```
 
 Healthcheck : `GET /api/health`.
-
-Compatible Coolify : fournir `CLERK_SECRET_KEY` en runtime **et**
-`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` (et URLs sign-in/up) en **build-args**,
-puis rebuild. Voir checklist SSO ci-dessus pour le proxy `/__clerk`.
-
-### Coolify : build OK puis échec à « unpacking »
-
-Le `next build` peut réussir et Coolify échouer ensuite (exit 255) sur
-l’unpack Docker — souvent **disque plein** ou attestations BuildKit.
-
-Sur le VPS :
-
-```bash
-df -h
-docker system df
-docker system prune -af   # libère images/caches inutilisés
-```
-
-Dans Coolify → app → Advanced / Docker Build Options (si dispo) :
-
-```text
---provenance=false --sbom=false
-```
-
-Puis **Redeploy**. L’ancienne version reste en ligne tant que le nouveau deploy échoue.
 
 ---
 
